@@ -23,11 +23,16 @@ public class AddController extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 	        throws ServletException, IOException {
-	    String name = request.getParameter("name");
-	    int hours = Integer.parseInt(request.getParameter("nombreHeure")); // Update parameter name
+		String name = request.getParameter("name");
+		int cin =Integer.parseInt( request.getParameter("cin"));
+		String surname = request.getParameter("surname");
+		int age = Integer.parseInt(request.getParameter("age"));
+		
+// Update parameter name
 
-	    Teacher teacher = new Teacher(name);
-	    teacher.setNombreHeure(hours);
+	    Teacher teacher = new Teacher(name,cin,surname,age);
+	    teacher.setNombreHeure(208);
+	
 
 	    teacherDAO.save(teacher); // Use the DAO to save the teacher
 

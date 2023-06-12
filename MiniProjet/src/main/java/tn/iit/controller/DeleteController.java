@@ -18,7 +18,8 @@ import java.util.List;
 @WebServlet("/DeleteController")
 public class DeleteController extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private TeacherDAO teacherDAO;
+   
+    private TeacherDAO teacherDAO =new TeacherDAO();
     public DeleteController() {
         super();
     }
@@ -29,8 +30,8 @@ public class DeleteController extends HttpServlet {
         ServletContext context = request.getServletContext();
         List<Teacher> tUser = (List<Teacher>) context.getAttribute("teacher");
 
-        if (id >= 0 && id < tUser.size()) {
-            tUser.remove(id);
+        if (id >= 0 ) {
+         
             teacherDAO.delete(id);
             
         }

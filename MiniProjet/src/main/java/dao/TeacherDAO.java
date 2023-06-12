@@ -1,6 +1,12 @@
 package dao;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 import hibernate.HibernateUtil;
 import tn.iit.models.Teacher;
@@ -41,14 +47,21 @@ public class TeacherDAO {
         }
     }
 
-    public Teacher read(int id) {
-        Session session = sessionFactory.getCurrentSession();
-        try {
-            return session.get(Teacher.class, id);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    public Teacher getTeacherById(int id) {
+    	 Session session = sessionFactory.getCurrentSession();
+    	    Transaction transaction = null;
+    	    try {
+    	        transaction = session.beginTransaction();
+    	        Teacher teacher = session.get(Teacher.class, id);
+    	        transaction.commit();
+    	        return teacher;
+    	    } catch (Exception e) {
+    	        if (transaction != null) {
+    	            transaction.rollback();
+    	        }
+    	        e.printStackTrace();
+    	        return null;
+    	    }
     }
 
     public void delete(int id) {
@@ -56,7 +69,9 @@ public class TeacherDAO {
         try {
             session.beginTransaction();
             Teacher teacher = session.get(Teacher.class, id);
+            System.out.println(teacher.getName());
             if (teacher != null) {
+            	System.out.println("test");
                 session.delete(teacher);
             }
             session.getTransaction().commit();
@@ -68,6 +83,15 @@ public class TeacherDAO {
         }
     }
 
+    public List<Teacher> getAllTeachers() {
+        EntityManager entityManager = sessionFactory.createEntityManager();
+        try {
+            TypedQuery<Teacher> query = entityManager.createQuery("SELECT t FROM Teacher t", Teacher.class);
+            return query.getResultList();
+        } finally {
+            entityManager.close();
+        }
+    }
     // Add other methods for CRUD operations and queries as needed
 
     // ...

@@ -1,82 +1,65 @@
 package tn.iit.servlet;
+import tn.iit.models.Authorization;
+import tn.iit.models.Teacher;
+import tn.iit.servlet.TeacherServlet;
 import javax.servlet.*;
 import javax.servlet.http.*;
+
+import dao.AuthorizationDAO;
+import dao.TeacherDAO;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class AuthorizationServlet extends HttpServlet {
     
-    private List<Authorization> authorizations = new ArrayList<>();
+    /**
+	 * 
+	 */
+	private final TeacherDAO teacherDAO = new TeacherDAO();
+    private AuthorizationDAO authorizationDAO = new AuthorizationDAO();
+
+
+    
+	private static final long serialVersionUID = 1L;
     
     @Override
+    	
+
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+            int teacherId = Integer.parseInt(request.getParameter("teacherId"));
+
+            Teacher teacher = teacherDAO.getTeacherById(teacherId);
+            if (teacher != null) {
+                List<Authorization> authorizations = authorizationDAO.getAuthorizationsByTeacher(teacher);
+
+                request.setAttribute("teacher", teacher);
+                request.setAttribute("authorizations", authorizations);
+                request.getRequestDispatcher("authorization.jsp").forward(request, response);}
+            }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int teacherId = Integer.parseInt(request.getParameter("teacherId"));
-        Teacher teacher = getTeacherById(teacherId);
-        
-        // Calcul du nombre d'heures autorisées pour l'enseignant
-        int remainingWeeks = getRemainingWeeks();
-        int authorizedHours = remainingWeeks * 4; // 4 heures par semaine
-        Authorization authorization = new Authorization(teacher, authorizedHours);
-        authorizations.add(authorization);
-        
-        response.sendRedirect("editAuthorization.jsp?teacherId=" + teacherId);
+        doGet(request, response);
     }
+    	   
+    	    
+    	    private void generateAuthorizationPDF(int teacherId, int authorizedHours) {
+    	        // Implement the code to generate the PDF document for the teacher's authorization
+    	        // You can use any PDF generation library or framework of your choice
+    	        
+    	        // Placeholder code
+    	        // Use the teacherId and authorizedHours to generate the PDF document
+    	        // Example: PDFGenerator.generateAuthorizationPDF(teacherId, authorizedHours);
+    	    }
     
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int teacherId = Integer.parseInt(request.getParameter("teacherId"));
-        Teacher teacher = getTeacherById(teacherId);
-        List<Authorization> teacherAuthorizations = getAuthorizationsByTeacher(teacher);
-        
-        request.setAttribute("teacher", teacher);
-        request.setAttribute("authorizations", teacherAuthorizations);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("editAuthorization.jsp");
-        dispatcher.forward(request, response);
-    }
     
-    private Teacher getTeacherById(int teacherId) {
-        Teacher[] teachers = null;//zeyda
-		for (Teacher teacher : teachers) {
-            if (teacher.getId() == teacherId) {
-                return teacher;
-            }
-        }
-        return null;
-    }
+ 
     
-    private List<Authorization> getAuthorizationsByTeacher(Teacher teacher) {
-        List<Authorization> teacherAuthorizations = new ArrayList<>();
-        for (Authorization authorization : authorizations) {
-            if (authorization.getTeacher().equals(teacher)) {
-                teacherAuthorizations.add(authorization);
-            }
-        }
-        return teacherAuthorizations;
-    }
     
-    private int getRemainingWeeks() {
-        // Calcul du nombre de semaines restantes de l'année courante
-        // ...
-        return getRemainingWeeks();
-    }
+   
 }
 
-class Authorization {
-    private Teacher teacher;
-    private int authorizedHours;
-    
-    public Authorization(Teacher teacher, int authorizedHours) {
-        this.teacher = teacher;
-        this.authorizedHours = authorizedHours;
-    }
-    
-    public Teacher getTeacher() {
-        return teacher;
-    }
-    
-    public int getAuthorizedHours() {
-        return authorizedHours;
-    }
-}
 
